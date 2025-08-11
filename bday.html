@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Happy Birthday (In Advance)</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+body{
+margin:0; min-height:100vh;
+display:flex; align-items:center; justify-content:center;
+background:linear-gradient(135deg,#fce38a 0%, #f38181 100%);
+color:#222;
+}
+.card{
+background:rgba(255,255,255,0.95);
+padding:26px; border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,0.12);
+max-width:420px; text-align:center;
+}
+h1{font-size:20px;margin:0 0 8px}
+.count{font-size:28px;font-weight:700;margin:12px 0 0}
+.sub{font-size:13px;color:#555;margin-top:8px}
+a.open-link{
+display:inline-block;margin-top:16px;padding:10px 16px;border-radius:999px;
+background:#ff6b6b;color:white;text-decoration:none;font-weight:600;
+}
+
+/* Modal */
+.modal-backdrop{
+position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+background:rgba(0,0,0,0.45);backdrop-filter:blur(3px);
+}
+.modal{
+background:white;border-radius:12px;padding:22px;max-width:520px;width:92%;
+text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.25);
+}
+.message{font-size:20px;font-weight:700;margin:0 0 8px;line-height:1.25}
+.heart{color:#e2556d;font-size:20px}
+.close-btn{
+margin-top:14px;padding:9px 14px;border-radius:10px;border:0;background:#222;color:white;
+cursor:pointer;font-weight:600;
+}
+
+/* small */
+.small{font-size:13px;color:#666;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="card" role="main">
+<h1>Birthday Countdown</h1>
+<div class="count" id="countdown">—</div>
+<div class="sub">Time left until <strong>12 Sep 2025</strong> (IST)</div>
+
+<a href="#" id="openPopup" class="open-link" aria-haspopup="dialog">Open your message</a>
+
+<div class="small">Tip: save this file and open it privately, or host it where you prefer.</div>
+</div>
+
+<!-- modal -->
+<div id="backdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+<div class="modal">
+<div class="message">HAPPY BIRTHDAY IN ADVANCE, LOVE<span class="heart">♥️</span><br>I LOVE YOU</div>
+<div class="small" id="modal-count">—</div>
+<button id="closeBtn" class="close-btn">Close</button>
+</div>
+</div>
+
+<script>
+(function(){
+// Target date: 12 Sep 2025 00:00 IST (UTC+5:30)
+const targetISO = '2025-09-12T00:00:00+05:30';
+const target = new Date(targetISO);
+
+const cdEl = document.getElementById('countdown');
+const modalCountEl = document.getElementById('modal-count');
+const backdrop = document.getElementById('backdrop');
+const openPopup = document.getElementById('openPopup');
+const closeBtn = document.getElementById('closeBtn');
+
+function formatParts(ms){
+if(ms <= 0) return {finished:true};
+const sec = Math.floor(ms/1000);
+const days = Math.floor(sec/86400);
+let rem = sec - days*86400;
+const hours = Math.floor(rem/3600); rem -= hours*3600;
+const minutes = Math.floor(rem/60);
+const seconds = rem - minutes*60;
+return {days,hours,minutes,seconds,finished:false};
+}
+
+function pretty(p){
+if(p.finished) return "It's here! 🎉";
+return `${p.days}d ${String(p.hours).padStart(2,'0')}h ${String(p.minutes).padStart(2,'0')}m ${String(p.seconds).padStart(2,'0')}s`;
+}
+
+function update(){
+const now = new Date();
+const diff = target - now;
+const parts = formatParts(diff);
+cdEl.textContent = pretty(parts);
+modalCountEl.textContent = "Countdown: " + pretty(parts);
+}
+
+// update every 250ms for snappy seconds
+update();
+setInterval(update, 250);
+
+// open modal on click
+openPopup.addEventListener('click', function(e){
+e.preventDefault();
+backdrop.style.display = 'flex';
+backdrop.setAttribute('aria-hidden','false');
+});
+
+closeBtn.addEventListener('click', function(){
+backdrop.style.display = 'none';
+backdrop.setAttribute('aria-hidden','true');
+});
+
+// close on backdrop click
+backdrop.addEventListener('click', function(e){
+if(e.target === backdrop){
+backdrop.style.display = 'none';
+backdrop.setAttribute('aria-hidden','true');
+}
+});
+
+// keyboard: ESC to close
+document.addEventListener('keydown', function(e){
+if(e.key === 'Escape' && backdrop.style.display === 'flex'){
+backdrop.style.display = 'none';
+backdrop.setAttribute('aria-hidden','true');
+}
+});
+
+// optionally open automatically if URL has ?open=1
+if(location.search.indexOf('open=1') !== -1){
+openPopup.click();
+}
+})();
+</script>
+</body>
+</html>
